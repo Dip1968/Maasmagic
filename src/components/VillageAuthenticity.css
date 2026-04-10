@@ -1,0 +1,148 @@
+/* ===== VILLAGE AUTHENTICITY ===== */
+.village-auth-section {
+    padding: 60px 0 120px;
+    background: var(--cream-light);
+    overflow: hidden;
+    position: relative;
+}
+
+.village-auth-section .container {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: var(--container-padding);
+    position: relative;
+    z-index: 2;
+}
+
+.va-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.va-header .section-eyebrow {
+    justify-content: center;
+}
+
+.va-header .section-eyebrow::before {
+    display: none;
+}
+
+.va-header .section-title {
+    text-align: center;
+}
+
+.va-header .section-subtitle {
+    margin: 0 auto;
+    text-align: center;
+    max-width: 600px;
+    font-family: var(--font-display);
+    font-style: italic;
+}
+
+/* Story Blocks */
+.va-story-blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+}
+
+.va-block {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.va-block.reverse {
+    flex-direction: row-reverse;
+}
+
+.va-block-img {
+    flex: 1.15;
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    aspect-ratio: 16 / 10;
+    background: var(--cream-dark);
+}
+
+.va-block-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s var(--ease-out);
+}
+
+.va-block:hover .va-block-img img {
+    transform: scale(1.05);
+}
+
+.va-block-content {
+    flex: 1;
+    padding: 20px;
+}
+
+.va-block-content h3 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--maroon);
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.va-block-content p {
+    font-size: 16px;
+    color: var(--text-muted);
+    line-height: 1.8;
+    margin-bottom: 30px;
+}
+
+.va-line {
+    height: 2px;
+    width: 60px;
+    background: var(--saffron);
+    border-radius: 2px;
+    transition: width 0.5s var(--ease-out);
+}
+
+.va-block:hover .va-line {
+    width: 100px;
+}
+
+@media (max-width: 992px) {
+
+    .va-block,
+    .va-block.reverse {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .va-block-img {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+    }
+
+    .va-block-content {
+        padding: 0;
+        text-align: center;
+    }
+
+    .va-line {
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .village-auth-section {
+        padding: 80px 0;
+    }
+
+    .va-story-blocks {
+        gap: 60px;
+    }
+
+    .va-block-content h3 {
+        font-size: 26px;
+    }
+}
