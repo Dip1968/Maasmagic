@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom';
 import './BestSellers.css';
 
 const bestSellers = [
-  { name: 'Masala Khakhra', price: '₹120', img: '/public/fried/khakhara_photo.png' },
-  { name: 'Chevdo', price: '₹150', img: '/public/fried/chevado.png' },
-  { name: 'Bataka Wafer', price: '₹130', img: '/public/raw_materials/bataka_wafer.png' },
-  { name: 'Chokha Papad', price: '₹100', img: '/public/raw_materials/kanchi_papad.png' },
+  { name: 'Masala Khakhra', price: '₹120', img: '/fried/khakhara_photo.png' },
+  { name: 'Chevdo', price: '₹150', img: '/fried/chevado.png' },
+  { name: 'Bataka Wafer', price: '₹130', img: '/raw_materials/bataka_wafer.png' },
+  { name: 'Chokha Papad', price: '₹100', img: '/raw_materials/kanchi_papad.png' },
 ];
 
 export default function BestSellers() {

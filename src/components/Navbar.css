@@ -32,10 +32,13 @@
 .nav-logo-img {
   width: 50px;
   height: 50px;
-  border-radius: 12px;
+  border-radius: 50%;
+  background: var(--white);
+  padding: 4px;
   object-fit: contain;
   flex-shrink: 0;
   transition: var(--transition-fast);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .nav-logo-img:hover {
@@ -51,7 +54,7 @@
   font-family: var(--font-body);
   font-size: 16px;
   font-weight: 800;
-  color: var(--maroon);
+  color: var(--saffron-glow);
   letter-spacing: 0.06em;
   line-height: 1;
   transition: var(--transition-fast);
@@ -64,9 +67,14 @@
 .nav-brand-sub {
   font-family: var(--font-body);
   font-size: 10.5px;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.75);
   letter-spacing: 0.03em;
   margin-top: 2px;
+  transition: var(--transition-fast);
+}
+
+.navbar.scrolled .nav-brand-sub {
+  color: var(--text-muted);
 }
 
 /* Nav Links */
@@ -136,8 +144,12 @@
 }
 
 /* Mobile Menu */
-.nav-hamburger {
+.nav-mobile-right {
   display: none;
+}
+
+.nav-hamburger {
+  display: flex;
   flex-direction: column;
   gap: 5px;
   cursor: pointer;
@@ -215,5 +227,61 @@
   }
   .nav-hamburger {
     display: flex;
+  }
+}
+
+@media (max-width: 992px) {
+  .nav-links {
+    display: none;
+  }
+  .nav-mobile-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .mobile-cart-btn {
+    display: flex !important;
+    align-items: center;
+    text-decoration: none;
+  }
+  .mobile-cart-icon {
+    stroke: var(--white);
+    transition: stroke 0.4s var(--ease-out);
+  }
+  .navbar.scrolled .mobile-cart-icon {
+    stroke: var(--charcoal);
+  }
+  .mobile-cart-badge {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background: var(--maroon);
+    color: var(--white);
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 800;
+  }
+  .nav-hamburger {
+    display: flex;
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar {
+    padding: 0 16px;
+  }
+  .nav-brand-sub {
+    display: none;
+  }
+  .nav-logo-img {
+    width: 40px;
+    height: 40px;
+  }
+  .nav-brand-name {
+    font-size: 14px;
+  }
+  .nav-mobile-right {
+    gap: 15px;
   }
 }

@@ -2,25 +2,25 @@ import './VillageAuthenticity.css';
 
 const authenticPhotos = [
     {
-        img: '/public/raw_materials/kanchi_papad.png',
+        img: '/raw_materials/kanchi_papad.png',
         title: 'Sun-Dried Kanchi Papad',
         desc: 'Each papad is carefully laid out on a traditional woven Khatiya to dry under the golden village sun, absorbing the warmth and purity of nature.',
         reverse: false
     },
     {
-        img: '/public/raw_materials/bataka_wafer.png',
+        img: '/raw_materials/bataka_wafer.png',
         title: 'Handcrafted Potato Wafers',
         desc: 'Paper-thin slices of fresh potatoes spread thoughtfully to retain their natural crispness and flavor, a sight right out of a vibrant Gujarati courtyard.',
         reverse: true
     },
     {
-        img: '/public/raw_materials/sabudana_vadi.png',
+        img: '/raw_materials/sabudana_vadi.png',
         title: 'Premium Sabudana Vadi',
         desc: 'Prepared with utmost devotion for fasting days, these perfectly shaped vadis are sun-dried for days to achieve that authentic crunchy texture when fried.',
         reverse: false
     },
     {
-        img: '/public/raw_materials/gau_lot_sev.png',
+        img: '/raw_materials/gau_lot_sev.png',
         title: 'Traditional Gau ni Sev',
         desc: 'Strings of pure wheat sev drying gracefully on the Khatiya, carrying the heritage of grandmothers’ recipes straight to your plate.',
         reverse: true

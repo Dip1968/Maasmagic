@@ -2,10 +2,10 @@ import './RotatingDishes.css';
 
 const dishes = [
   {
-    name: 'Farsi Puri', category: 'Traditional', img: '/public/fried/farsi_puri.png', size: 'lg', delay: '0s', duration: '18s'
+    name: 'Farsi Puri', category: 'Traditional', img: '/fried/farsi_puri.png', size: 'lg', delay: '0s', duration: '18s'
   },
-  { name: 'Chevdo', category: 'Bestseller', img: '/public/fried/chevado_v2.png', size: 'xl', delay: '-6s', duration: '22s' },
-  { name: 'Shakkar Para', category: 'Most Popular', img: '/public/fried/shakkar_para.png', size: 'lg', delay: '-12s', duration: '16s' },
+  { name: 'Chevdo', category: 'Bestseller', img: '/fried/chevado_v2.png', size: 'xl', delay: '-6s', duration: '22s' },
+  { name: 'Shakkar Para', category: 'Most Popular', img: '/fried/shakkar_para.png', size: 'lg', delay: '-12s', duration: '16s' },
 ];
 
 export default function RotatingDishes() {

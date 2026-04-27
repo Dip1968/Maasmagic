@@ -4,7 +4,7 @@ const products = [
   {
     name: 'Masala Khakhra',
     desc: 'Crispy, thin flatbread infused with aromatic spices. Perfect with chai or as a light snack anytime.',
-    img: '/public/fried/khakhara_photo.png',
+    img: '/fried/khakhara_photo.png',
     badge: 'Bestseller',
     price: '₹120',
     unit: 'per 200g pack',
@@ -13,7 +13,7 @@ const products = [
   {
     name: 'Gau ni Sev',
     desc: 'Traditional thin vermicelli sev made from gram flour — a village classic with an irresistible crunch.',
-    img: '/public/raw_materials/gau_lot_sev.png',
+    img: '/raw_materials/gau_lot_sev.png',
     badge: 'Traditional',
     price: '₹150',
     unit: 'per 250g pack',
@@ -22,7 +22,7 @@ const products = [
   {
     name: 'Chokha Papad',
     desc: 'Sun-dried lentil papad made with farm-fresh ingredients. Crispy, pure, and utterly addictive.',
-    img: '/public/raw_materials/kanchi_papad.png',
+    img: '/raw_materials/kanchi_papad.png',
     badge: 'Most Popular',
     price: '₹100',
     unit: 'per 200g pack',
@@ -31,7 +31,7 @@ const products = [
   {
     name: 'Sabudana Vadi',
     desc: 'Golden-fried sago fritters with peanuts and spices — the perfect fasting snack with rustic flavour.',
-    img: '/public/raw_materials/sabudana_vadi.png',
+    img: '/raw_materials/sabudana_vadi.png',
     badge: 'Fasting Special',
     price: '₹180',
     unit: 'per 200g pack',
@@ -40,7 +40,7 @@ const products = [
   {
     name: 'Bataka ni Wafer',
     desc: 'Paper-thin potato wafers fried to golden perfection. A timeless Gujarati favourite for every occasion.',
-    img: '/public/raw_materials/bataka_wafer.png',
+    img: '/raw_materials/bataka_wafer.png',
     badge: "Everyone's Choice",
     price: '₹130',
     unit: 'per 250g pack',
@@ -90,7 +90,7 @@ export default function ProductShowcase() {
                     <span className="product-price-amount">{product.price}</span>
                     <span className="product-price-unit">{product.unit}</span>
                   </div>
-                  <button className="wa-order-btn" id={`wa-btn-${i}`}>
+                  <button className="wa-order-btn" id={`wa-btn-${i}`} onClick={() => window.open(`https://wa.me/917984300882?text=${encodeURIComponent('Hi, I am interested in ordering ' + product.name)}`, '_blank')}>
                     <WhatsAppIcon />
                     Order
                   </button>

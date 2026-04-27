@@ -8,7 +8,7 @@ const rawProducts = [
   {
     name: 'Bataka ni Wafer (Raw)',
     desc: 'Paper-thin raw potato wafers. Ready to fry for a fresh, crispy snack.',
-    img: '/public/raw_materials/bataka_wafer_raw.png',
+    img: '/raw_materials/bataka_wafer_raw.png',
     badge: 'Raw Material',
     price: '₹150',
     unit: 'per 1kg',
@@ -18,7 +18,7 @@ const rawProducts = [
   {
     name: 'Gau ni Sev (Raw)',
     desc: 'Traditional wheat sev raw material. Fry at home for authentic crunch.',
-    img: '/public/raw_materials/gau_sev_raw.png',
+    img: '/raw_materials/gau_sev_raw.png',
     badge: 'Traditional',
     price: '₹150',
     unit: 'per 1kg',
@@ -28,7 +28,7 @@ const rawProducts = [
   {
     name: 'Kanchi Papad',
     desc: 'Sun-dried raw papad made with farm-fresh ingredients.',
-    img: '/public/raw_materials/kanchi_papad_raw.png',
+    img: '/raw_materials/kanchi_papad_raw.png',
     badge: 'Most Popular',
     price: '₹170',
     unit: 'per 1kg',
@@ -38,7 +38,7 @@ const rawProducts = [
   {
     name: 'Sabudana Vadi (Raw)',
     desc: 'Sago vadi raw material. Perfect for fasting days when fried fresh.',
-    img: '/public/raw_materials/sabudana_vadi_raw.png',
+    img: '/raw_materials/sabudana_vadi_raw.png',
     badge: 'Fasting Special',
     price: '₹180',
     unit: 'per 1kg',
@@ -51,7 +51,7 @@ const preparedProducts = [
   {
     name: 'Nylon Poha Chevdo',
     desc: 'Crispy, sweet, and tangy roasted poha chevdo mixed with nuts.',
-    img: '/public/fried/chevado.png',
+    img: '/fried/chevado.png',
     badge: 'Bestseller',
     price: '₹200',
     unit: 'per 1kg',
@@ -61,7 +61,7 @@ const preparedProducts = [
   {
     name: 'Farsi Puri',
     desc: 'Crispy and flaky Gujarati savory flatbread snack, fried to perfection.',
-    img: '/public/fried/farsi_puri.png',
+    img: '/fried/farsi_puri.png',
     badge: 'Traditional',
     price: '₹250',
     unit: 'per 1kg',
@@ -71,7 +71,7 @@ const preparedProducts = [
   {
     name: 'Masala Khakhra',
     desc: 'Roasted thin flatbread infused with aromatic spices.',
-    img: '/public/fried/khakhara_photo.png',
+    img: '/fried/khakhara_photo.png',
     badge: 'Healthy Snack',
     price: '₹200',
     unit: 'per 1kg',
@@ -81,7 +81,7 @@ const preparedProducts = [
   {
     name: 'Shakkarpara (Normal)',
     desc: 'Savory fried diamond shapes with a hint of salt and spices.',
-    img: '/public/fried/shakkar_para.png',
+    img: '/fried/shakkar_para.png',
     badge: 'Classic',
     price: '₹200',
     unit: 'per 1kg',
@@ -91,7 +91,7 @@ const preparedProducts = [
   {
     name: 'Shakkarpara (Sweet)',
     desc: 'Sweet, crispy, and bite-sized delights with sugar coating.',
-    img: '/public/fried/shakkar_para_sweet.png',
+    img: '/fried/shakkar_para_sweet.png',
     badge: 'Sweet Treat',
     price: '₹250',
     unit: 'per 1kg',
