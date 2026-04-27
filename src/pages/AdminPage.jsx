@@ -2,7 +2,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useProducts } from '../context/ProductContext';
 import { useAdminAuth } from '../context/AdminAuthContext';
-import { categories, createEmptyProduct, formatPrice } from '../data/products';
+import {
+  categories,
+  createEmptyProduct,
+  formatPrice,
+  getDefaultVariant,
+  getTotalStock,
+  getVariantById,
+} from '../data/products';
 import './AdminPage.css';
 
 const productSections = [
@@ -10,13 +17,16 @@ const productSections = [
   { value: 'raw', label: 'Raw Material' },
 ];
 
-const initialFormState = {
+const createInitialFormState = () => ({
   ...createEmptyProduct(),
   category: 'Namkeen',
   section: 'prepared',
   badge: 'New',
-  stock: 10,
-};
+  variants: [
+    { id: '500gm', label: '500gm', price: 0, stock: 0 },
+    { id: '1kg', label: '1kg', price: 0, stock: 10 },
+  ],
+});
 
 const toSlug = (value) =>
   value
@@ -28,7 +38,7 @@ const toSlug = (value) =>
 export default function AdminPage() {
   const { isAuthenticated, login, logout } = useAdminAuth();
   const { products, addProduct, updateProduct, deleteProduct, resetProducts } = useProducts();
-  const [formState, setFormState] = useState(initialFormState);
+  const [formState, setFormState] = useState(createInitialFormState);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
   const [credentials, setCredentials] = useState({ username: '', password: '' });
@@ -51,14 +61,27 @@ export default function AdminPage() {
   }, [products, searchTerm]);
 
   const activeCount = products.filter((product) => product.isActive).length;
-  const lowStockCount = products.filter((product) => product.stock > 0 && product.stock <= 10).length;
-  const outOfStockCount = products.filter((product) => product.stock === 0).length;
+  const lowStockCount = products.filter((product) =>
+    product.variants.some((variant) => variant.stock > 0 && variant.stock <= 10)
+  ).length;
+  const outOfStockCount = products.filter((product) => getTotalStock(product) === 0).length;
 
   const handleFormChange = (event) => {
     const { name, value, type, checked } = event.target;
     setFormState((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  const handleVariantFormChange = (variantId, field, value) => {
+    setFormState((prev) => ({
+      ...prev,
+      variants: prev.variants.map((variant) =>
+        variant.id === variantId
+          ? { ...variant, [field]: field === 'price' || field === 'stock' ? Number(value) : value }
+          : variant
+      ),
     }));
   };
 
@@ -78,10 +101,12 @@ export default function AdminPage() {
       desc: formState.desc.trim(),
       img: formState.img.trim(),
       badge: formState.badge.trim(),
-      unit: formState.unit.trim(),
       category: formState.category.trim(),
-      price: Number(formState.price),
-      stock: Number(formState.stock),
+      variants: formState.variants.map((variant) => ({
+        ...variant,
+        price: Number(variant.price),
+        stock: Number(variant.stock),
+      })),
       tags: formState.tags
         .toString()
         .split(',')
@@ -89,13 +114,25 @@ export default function AdminPage() {
         .filter(Boolean),
     });
 
-    setFormState(initialFormState);
+    setFormState(createInitialFormState());
     setStatusMessage(`Added "${trimmedName}" to the catalog.`);
   };
 
   const handleInlineChange = (productId, field, value) => {
-    const changes = ['price', 'stock'].includes(field) ? { [field]: Number(value) } : { [field]: value };
-    updateProduct(productId, changes);
+    updateProduct(productId, { [field]: value });
+  };
+
+  const handleVariantInlineChange = (productId, variantId, field, value) => {
+    const product = products.find((item) => item.id === productId);
+    if (!product) return;
+
+    const variants = product.variants.map((variant) =>
+      variant.id === variantId
+        ? { ...variant, [field]: field === 'price' || field === 'stock' ? Number(value) : value }
+        : variant
+    );
+
+    updateProduct(productId, { variants });
   };
 
   const handleCredentialChange = (event) => {
@@ -232,18 +269,6 @@ export default function AdminPage() {
                   <input name="img" value={formState.img} onChange={handleFormChange} placeholder="/images/example.png" />
                 </label>
                 <label>
-                  Price
-                  <input name="price" type="number" min="0" value={formState.price} onChange={handleFormChange} />
-                </label>
-                <label>
-                  Stock quantity
-                  <input name="stock" type="number" min="0" value={formState.stock} onChange={handleFormChange} />
-                </label>
-                <label>
-                  Unit
-                  <input name="unit" value={formState.unit} onChange={handleFormChange} placeholder="per 1kg" />
-                </label>
-                <label>
                   Category
                   <input name="category" list="product-categories" value={formState.category} onChange={handleFormChange} />
                 </label>
@@ -259,6 +284,34 @@ export default function AdminPage() {
                   Tags
                   <input name="tags" value={formState.tags} onChange={handleFormChange} placeholder="Crunchy, Handmade, Spicy" />
                 </label>
+                <div className="admin-form-full admin-variant-editor">
+                  <span className="admin-variant-title">Pack sizes</span>
+                  <div className="admin-variant-grid">
+                    {formState.variants.map((variant) => (
+                      <div key={variant.id} className="admin-variant-card">
+                        <strong>{variant.label}</strong>
+                        <label>
+                          Price
+                          <input
+                            type="number"
+                            min="0"
+                            value={variant.price}
+                            onChange={(event) => handleVariantFormChange(variant.id, 'price', event.target.value)}
+                          />
+                        </label>
+                        <label>
+                          Stock
+                          <input
+                            type="number"
+                            min="0"
+                            value={variant.stock}
+                            onChange={(event) => handleVariantFormChange(variant.id, 'stock', event.target.value)}
+                          />
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
                 <label className="admin-toggle">
                   <input name="isActive" type="checkbox" checked={formState.isActive} onChange={handleFormChange} />
                   <span>Show on storefront</span>
@@ -273,7 +326,7 @@ export default function AdminPage() {
 
               <div className="admin-form-actions">
                 <button type="submit" className="admin-primary-btn">Add product</button>
-                <button type="button" className="admin-secondary-btn" onClick={() => setFormState(initialFormState)}>
+                <button type="button" className="admin-secondary-btn" onClick={() => setFormState(createInitialFormState())}>
                   Clear form
                 </button>
               </div>
@@ -305,13 +358,24 @@ export default function AdminPage() {
             <div className="admin-product-list">
               {visibleProducts.map((product) => (
                 <article key={product.id} className="admin-product-card">
+                  {(() => {
+                    const defaultVariant = getDefaultVariant(product);
+                    const halfKgVariant = getVariantById(product, '500gm');
+                    const oneKgVariant = getVariantById(product, '1kg');
+                    const totalStock = getTotalStock(product);
+
+                    return (
+                      <>
                   <div className="admin-product-summary">
                     <img src={product.img} alt={product.name} />
                     <div>
                       <h3>{product.name}</h3>
-                      <p>{formatPrice(product.price)} {product.unit}</p>
-                      <span className={`admin-stock-state ${product.stock === 0 ? 'out' : product.stock <= 10 ? 'low' : 'ok'}`}>
-                        {product.stock === 0 ? 'Out of stock' : product.stock <= 10 ? `Low stock: ${product.stock}` : `In stock: ${product.stock}`}
+                      <p>
+                        {formatPrice(defaultVariant.price)} starting price
+                        <span className="admin-summary-meta"> | 500gm {formatPrice(halfKgVariant.price)} | 1kg {formatPrice(oneKgVariant.price)}</span>
+                      </p>
+                      <span className={`admin-stock-state ${totalStock === 0 ? 'out' : totalStock <= 10 ? 'low' : 'ok'}`}>
+                        {totalStock === 0 ? 'Out of stock' : totalStock <= 10 ? `Low stock: ${totalStock}` : `In stock: ${totalStock}`}
                       </span>
                     </div>
                   </div>
@@ -320,18 +384,6 @@ export default function AdminPage() {
                     <label>
                       Name
                       <input value={product.name} onChange={(event) => handleInlineChange(product.id, 'name', event.target.value)} />
-                    </label>
-                    <label>
-                      Price
-                      <input type="number" min="0" value={product.price} onChange={(event) => handleInlineChange(product.id, 'price', event.target.value)} />
-                    </label>
-                    <label>
-                      Stock
-                      <input type="number" min="0" value={product.stock} onChange={(event) => handleInlineChange(product.id, 'stock', event.target.value)} />
-                    </label>
-                    <label>
-                      Unit
-                      <input value={product.unit} onChange={(event) => handleInlineChange(product.id, 'unit', event.target.value)} />
                     </label>
                     <label>
                       Category
@@ -378,6 +430,34 @@ export default function AdminPage() {
                         }
                       />
                     </label>
+                    <div className="admin-product-full admin-variant-editor">
+                      <span className="admin-variant-title">Pack sizes</span>
+                      <div className="admin-variant-grid">
+                        {product.variants.map((variant) => (
+                          <div key={variant.id} className="admin-variant-card">
+                            <strong>{variant.label}</strong>
+                            <label>
+                              Price
+                              <input
+                                type="number"
+                                min="0"
+                                value={variant.price}
+                                onChange={(event) => handleVariantInlineChange(product.id, variant.id, 'price', event.target.value)}
+                              />
+                            </label>
+                            <label>
+                              Stock
+                              <input
+                                type="number"
+                                min="0"
+                                value={variant.stock}
+                                onChange={(event) => handleVariantInlineChange(product.id, variant.id, 'stock', event.target.value)}
+                              />
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
 
                   <div className="admin-product-actions">
@@ -389,6 +469,9 @@ export default function AdminPage() {
                       Delete product
                     </button>
                   </div>
+                      </>
+                    );
+                  })()}
                 </article>
               ))}
             </div>

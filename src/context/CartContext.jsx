@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useProducts } from './ProductContext';
+import { getVariantById } from '../data/products';
 
 const CartContext = createContext();
 
@@ -19,29 +20,49 @@ export function CartProvider({ children }) {
 
     useEffect(() => {
         setCartItems(prev => prev.map(item => {
-            const latest = products.find(product => product.id === item.id || product.name === item.name);
+            const latest = products.find(product => product.id === item.productId || product.id === item.id || product.name === item.name);
             if (!latest) return item;
+            const latestVariant = getVariantById(latest, item.variantId);
 
             return {
                 ...item,
-                ...latest,
-                quantity: Math.min(item.quantity, latest.stock),
+                productId: latest.id,
+                name: latest.name,
+                img: latest.img,
+                badge: latest.badge,
+                category: latest.category,
+                variantId: latestVariant.id,
+                variantLabel: latestVariant.label,
+                price: latestVariant.price,
+                stock: latestVariant.stock,
+                quantity: Math.min(item.quantity, latestVariant.stock),
             };
         }).filter(item => item.quantity > 0));
     }, [products]);
 
-    const addToCart = (product) => {
+    const addToCart = (product, variant) => {
         setCartItems(prev => {
-            if (product.stock <= 0) return prev;
+            if (!variant || variant.stock <= 0) return prev;
 
-            const existing = prev.find(item => item.id === product.id);
+            const cartId = `${product.id}-${variant.id}`;
+            const existing = prev.find(item => item.id === cartId);
             if (existing) {
-                if (existing.quantity >= product.stock) return prev;
+                if (existing.quantity >= variant.stock) return prev;
                 return prev.map(item =>
-                    item.id === product.id ? { ...item, ...product, quantity: item.quantity + 1 } : item
+                    item.id === cartId ? { ...item, quantity: item.quantity + 1, stock: variant.stock, price: variant.price } : item
                 );
             }
-            return [...prev, { ...product, quantity: 1 }];
+            return [...prev, {
+                id: cartId,
+                productId: product.id,
+                name: product.name,
+                img: product.img,
+                variantId: variant.id,
+                variantLabel: variant.label,
+                price: variant.price,
+                stock: variant.stock,
+                quantity: 1
+            }];
         });
     };
 
@@ -52,11 +73,12 @@ export function CartProvider({ children }) {
     const updateQuantity = (id, amount) => {
         setCartItems(prev => prev.map(item => {
             if (item.id === id) {
-                const latest = products.find(product => product.id === id);
-                const maxStock = latest?.stock ?? item.stock ?? Infinity;
+                const latest = products.find(product => product.id === item.productId);
+                const latestVariant = latest ? getVariantById(latest, item.variantId) : null;
+                const maxStock = latestVariant?.stock ?? item.stock ?? Infinity;
                 const newQty = item.quantity + amount;
                 if (newQty <= 0) return null;
-                return { ...item, quantity: Math.min(newQty, maxStock) };
+                return { ...item, quantity: Math.min(newQty, maxStock), stock: maxStock, price: latestVariant?.price ?? item.price };
             }
             return item;
         }).filter(Boolean).filter(item => item.quantity > 0));

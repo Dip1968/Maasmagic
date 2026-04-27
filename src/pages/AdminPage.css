@@ -327,6 +327,39 @@
   color: var(--forest-green);
 }
 
+.admin-variant-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-variant-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+
+.admin-variant-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-variant-card {
+  border: 1px solid #ede5d7;
+  border-radius: 8px;
+  padding: 14px;
+  background: var(--cream-light);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-variant-card strong {
+  font-size: 14px;
+  color: var(--maroon);
+}
+
 .admin-toolbar {
   margin-bottom: 18px;
 }
@@ -368,6 +401,11 @@
 
 .admin-product-summary p {
   margin-bottom: 8px;
+}
+
+.admin-summary-meta {
+  color: var(--text-muted);
+  font-size: 12px;
 }
 
 .admin-stock-state {
@@ -426,6 +464,10 @@
   .admin-stats,
   .admin-form-grid,
   .admin-product-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-variant-grid {
     grid-template-columns: 1fr;
   }
 

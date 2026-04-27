@@ -46,7 +46,7 @@ export default function CartPage() {
         message += `*Order Items:*\n`;
         cartItems.forEach((item, index) => {
             const price = Number(item.price) || 0;
-            message += `${index + 1}. ${item.name} (${item.unit})\n   ${item.quantity} x ₹${price} = ₹${item.quantity * price}\n`;
+            message += `${index + 1}. ${item.name} (${item.variantLabel})\n   ${item.quantity} x ₹${price} = ₹${item.quantity * price}\n`;
         });
 
         const total = getCartTotal();
@@ -93,7 +93,7 @@ export default function CartPage() {
                                         <img src={item.img} alt={item.name} />
                                         <div className="cart-item-info">
                                             <h3>{item.name}</h3>
-                                            <p>{formatPrice(item.price)} {item.unit}</p>
+                                            <p>{formatPrice(item.price)} per {item.variantLabel}</p>
                                         </div>
                                     </div>
 

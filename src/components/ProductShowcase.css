@@ -152,10 +152,45 @@
   margin-bottom: 20px;
 }
 
+.product-variant-block {
+  margin-bottom: 16px;
+}
+
+.product-variant-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.product-variant-tab {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid #e3dbcf;
+  border-radius: 8px;
+  background: var(--cream-light);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  transition: var(--transition-fast);
+}
+
+.product-variant-tab.active {
+  background: rgba(123, 28, 28, 0.08);
+  border-color: var(--maroon);
+  color: var(--maroon);
+}
+
+.product-variant-stock {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
 .product-card-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 }
 
 .product-price {

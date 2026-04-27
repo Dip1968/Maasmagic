@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { createEmptyProduct, initialProducts } from '../data/products';
+import { createEmptyProduct, initialProducts, normalizeVariants } from '../data/products';
 
 const ProductContext = createContext();
 const STORAGE_KEY = 'village_products';
@@ -7,9 +7,8 @@ const STORAGE_KEY = 'village_products';
 const normalizeProduct = (product) => ({
   ...createEmptyProduct(),
   ...product,
-  price: Number(product.price || 0),
-  stock: Math.max(0, Number(product.stock || 0)),
   tags: Array.isArray(product.tags) ? product.tags : [],
+  variants: normalizeVariants(product.variants, product.price, product.stock),
   isActive: product.isActive !== false,
 });
 

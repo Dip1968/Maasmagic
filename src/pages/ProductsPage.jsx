@@ -1,16 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useProducts } from '../context/ProductContext';
-import { categories, formatPrice } from '../data/products';
+import { categories, formatPrice, getDefaultVariant, getTotalStock, getVariantById } from '../data/products';
 import './ProductsPage.css';
 import '../components/ProductShowcase.css';
 
 const ProductCard = ({ product, i, sectionType }) => {
   const { addToCart, cartItems } = useCart();
   const navigate = useNavigate();
-  const inCart = cartItems.find(item => item.id === product.id);
-  const isOutOfStock = product.stock <= 0;
+  const defaultVariant = useMemo(() => getDefaultVariant(product), [product]);
+  const [selectedVariantId, setSelectedVariantId] = useState(defaultVariant.id);
+
+  useEffect(() => {
+    setSelectedVariantId(getDefaultVariant(product).id);
+  }, [product]);
+
+  const selectedVariant = getVariantById(product, selectedVariantId);
+  const cartItemId = `${product.id}-${selectedVariant.id}`;
+  const inCart = cartItems.find(item => item.id === cartItemId);
+  const isOutOfStock = getTotalStock(product) <= 0 || selectedVariant.stock <= 0;
 
   return (
     <div className="product-card" key={product.name} id={`product-${sectionType}-${i}`}>
@@ -28,10 +37,27 @@ const ProductCard = ({ product, i, sectionType }) => {
             <span className="product-tag" key={tag}>{tag}</span>
           ))}
         </div>
+        <div className="product-variant-block">
+          <div className="product-variant-tabs">
+            {product.variants.map((variant) => (
+              <button
+                key={variant.id}
+                type="button"
+                className={`product-variant-tab ${selectedVariant.id === variant.id ? 'active' : ''}`}
+                onClick={() => setSelectedVariantId(variant.id)}
+              >
+                {variant.label}
+              </button>
+            ))}
+          </div>
+          <div className="product-variant-stock">
+            {selectedVariant.stock > 0 ? `${selectedVariant.stock} packs available` : 'This size is out of stock'}
+          </div>
+        </div>
         <div className="product-card-footer">
           <div className="product-price">
-            <span className="product-price-amount">{formatPrice(product.price)}</span>
-            <span className="product-price-unit">{product.unit}</span>
+            <span className="product-price-amount">{formatPrice(selectedVariant.price)}</span>
+            <span className="product-price-unit">per {selectedVariant.label}</span>
           </div>
           {inCart ? (
             <button className="wa-order-btn" style={{ background: 'var(--maroon)' }} onClick={() => navigate('/cart')}>
@@ -42,7 +68,7 @@ const ProductCard = ({ product, i, sectionType }) => {
               Out of Stock
             </button>
           ) : (
-            <button className="wa-order-btn" style={{ background: 'var(--saffron)', color: 'var(--white)' }} onClick={() => addToCart(product)}>
+            <button className="wa-order-btn" style={{ background: 'var(--saffron)', color: 'var(--white)' }} onClick={() => addToCart(product, selectedVariant)}>
               + Add to Cart
             </button>
           )}
