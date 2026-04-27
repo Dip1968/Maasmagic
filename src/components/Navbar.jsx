@@ -44,6 +44,7 @@ export default function Navbar() {
           <Link className="nav-link" to="/">Home</Link>
           <a className="nav-link" href={isHome ? '#about' : '/#about'}>About Us</a>
           <Link className="nav-link" to="/products">Products</Link>
+          <Link className="nav-link" to="/admin">Admin</Link>
           <a className="nav-link" href={isHome ? '#reviews' : '/#reviews'}>Reviews</a>
           <a className="nav-link" href={isHome ? '#contact' : '/#contact'}>Contact</a>
           <Link to="/cart" className="nav-cta" id="nav-order-btn" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -73,6 +74,7 @@ export default function Navbar() {
         <Link to="/" onClick={toggleMenu}>Home</Link>
         <a href={isHome ? '#about' : '/#about'} onClick={toggleMenu}>About Us</a>
         <Link to="/products" onClick={toggleMenu}>Products</Link>
+        <Link to="/admin" onClick={toggleMenu}>Admin</Link>
         <a href={isHome ? '#reviews' : '/#reviews'} onClick={toggleMenu}>Reviews</a>
         <a href={isHome ? '#contact' : '/#contact'} onClick={toggleMenu}>Contact Us</a>
       </div>

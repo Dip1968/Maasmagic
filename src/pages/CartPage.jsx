@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { formatPrice } from '../data/products';
 import './CartPage.css';
 
 export default function CartPage() {
@@ -44,7 +45,7 @@ export default function CartPage() {
 
         message += `*Order Items:*\n`;
         cartItems.forEach((item, index) => {
-            const price = parseInt(item.price.replace(/[^0-9]/g, ''), 10) || 0;
+            const price = Number(item.price) || 0;
             message += `${index + 1}. ${item.name} (${item.unit})\n   ${item.quantity} x ₹${price} = ₹${item.quantity * price}\n`;
         });
 
@@ -83,28 +84,28 @@ export default function CartPage() {
                         </div>
 
                         {cartItems.map((item, i) => {
-                            const price = parseInt(item.price.replace(/[^0-9]/g, ''), 10) || 0;
+                            const price = Number(item.price) || 0;
                             const itemTotal = price * item.quantity;
 
                             return (
-                                <div className="cart-item" key={i}>
+                                <div className="cart-item" key={item.id || i}>
                                     <div className="cart-item-product">
                                         <img src={item.img} alt={item.name} />
                                         <div className="cart-item-info">
                                             <h3>{item.name}</h3>
-                                            <p>{item.price} {item.unit}</p>
+                                            <p>{formatPrice(item.price)} {item.unit}</p>
                                         </div>
                                     </div>
 
                                     <div className="cart-item-qty">
-                                        <button onClick={() => updateQuantity(item.name, -1)}>−</button>
+                                        <button onClick={() => updateQuantity(item.id, -1)}>−</button>
                                         <span>{item.quantity}</span>
-                                        <button onClick={() => updateQuantity(item.name, 1)}>+</button>
+                                        <button onClick={() => updateQuantity(item.id, 1)} disabled={item.quantity >= item.stock}>+</button>
                                     </div>
 
                                     <div className="cart-item-total">
                                         ₹{itemTotal}
-                                        <button className="cart-item-remove" onClick={() => removeFromCart(item.name)}>✕</button>
+                                        <button className="cart-item-remove" onClick={() => removeFromCart(item.id)}>✕</button>
                                     </div>
                                 </div>
                             );

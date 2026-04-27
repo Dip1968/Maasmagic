@@ -1,111 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useProducts } from '../context/ProductContext';
+import { categories, formatPrice } from '../data/products';
 import './ProductsPage.css';
 import '../components/ProductShowcase.css';
-
-const rawProducts = [
-  {
-    name: 'Bataka ni Wafer (Raw)',
-    desc: 'Paper-thin raw potato wafers. Ready to fry for a fresh, crispy snack.',
-    img: '/raw_materials/bataka_wafer_raw.png',
-    badge: 'Raw Material',
-    price: '₹150',
-    unit: 'per 1kg',
-    tags: ['Ready to Fry', 'Pure'],
-    category: 'Chips',
-  },
-  {
-    name: 'Gau ni Sev (Raw)',
-    desc: 'Traditional wheat sev raw material. Fry at home for authentic crunch.',
-    img: '/raw_materials/gau_sev_raw.png',
-    badge: 'Traditional',
-    price: '₹150',
-    unit: 'per 1kg',
-    tags: ['Wheat', 'Classic'],
-    category: 'Papad',
-  },
-  {
-    name: 'Kanchi Papad',
-    desc: 'Sun-dried raw papad made with farm-fresh ingredients.',
-    img: '/raw_materials/kanchi_papad_raw.png',
-    badge: 'Most Popular',
-    price: '₹170',
-    unit: 'per 1kg',
-    tags: ['Sun-dried', 'Pure'],
-    category: 'Papad',
-  },
-  {
-    name: 'Sabudana Vadi (Raw)',
-    desc: 'Sago vadi raw material. Perfect for fasting days when fried fresh.',
-    img: '/raw_materials/sabudana_vadi_raw.png',
-    badge: 'Fasting Special',
-    price: '₹180',
-    unit: 'per 1kg',
-    tags: ['Fasting', 'Crispy'],
-    category: 'Fasting',
-  }
-];
-
-const preparedProducts = [
-  {
-    name: 'Nylon Poha Chevdo',
-    desc: 'Crispy, sweet, and tangy roasted poha chevdo mixed with nuts.',
-    img: '/fried/chevado.png',
-    badge: 'Bestseller',
-    price: '₹200',
-    unit: 'per 1kg',
-    tags: ['Crunchy', 'Prepared'],
-    category: 'Namkeen',
-  },
-  {
-    name: 'Farsi Puri',
-    desc: 'Crispy and flaky Gujarati savory flatbread snack, fried to perfection.',
-    img: '/fried/farsi_puri.png',
-    badge: 'Traditional',
-    price: '₹250',
-    unit: 'per 1kg',
-    tags: ['Crispy', 'Prepared'],
-    category: 'Namkeen',
-  },
-  {
-    name: 'Masala Khakhra',
-    desc: 'Roasted thin flatbread infused with aromatic spices.',
-    img: '/fried/khakhara_photo.png',
-    badge: 'Healthy Snack',
-    price: '₹200',
-    unit: 'per 1kg',
-    tags: ['Handmade', 'Roasted'],
-    category: 'Namkeen',
-  },
-  {
-    name: 'Shakkarpara (Normal)',
-    desc: 'Savory fried diamond shapes with a hint of salt and spices.',
-    img: '/fried/shakkar_para.png',
-    badge: 'Classic',
-    price: '₹200',
-    unit: 'per 1kg',
-    tags: ['Fried', 'Crunchy'],
-    category: 'Namkeen',
-  },
-  {
-    name: 'Shakkarpara (Sweet)',
-    desc: 'Sweet, crispy, and bite-sized delights with sugar coating.',
-    img: '/fried/shakkar_para_sweet.png',
-    badge: 'Sweet Treat',
-    price: '₹250',
-    unit: 'per 1kg',
-    tags: ['Sweet', 'Fried'],
-    category: 'Sweet',
-  }
-];
-
-const categories = ['All', 'Namkeen', 'Papad', 'Fasting', 'Chips', 'Sweet'];
 
 const ProductCard = ({ product, i, sectionType }) => {
   const { addToCart, cartItems } = useCart();
   const navigate = useNavigate();
-  const inCart = cartItems.find(item => item.name === product.name);
+  const inCart = cartItems.find(item => item.id === product.id);
+  const isOutOfStock = product.stock <= 0;
 
   return (
     <div className="product-card" key={product.name} id={`product-${sectionType}-${i}`}>
@@ -113,6 +18,7 @@ const ProductCard = ({ product, i, sectionType }) => {
         <img src={product.img} alt={product.name} />
         <div className="product-badge">{product.badge}</div>
         <div className="veg-badge"></div>
+        {isOutOfStock && <div className="product-stock-pill">Out of Stock</div>}
       </div>
       <div className="product-card-body">
         <h3 className="product-card-name">{product.name}</h3>
@@ -124,12 +30,16 @@ const ProductCard = ({ product, i, sectionType }) => {
         </div>
         <div className="product-card-footer">
           <div className="product-price">
-            <span className="product-price-amount">{product.price}</span>
+            <span className="product-price-amount">{formatPrice(product.price)}</span>
             <span className="product-price-unit">{product.unit}</span>
           </div>
           {inCart ? (
             <button className="wa-order-btn" style={{ background: 'var(--maroon)' }} onClick={() => navigate('/cart')}>
               View Cart
+            </button>
+          ) : isOutOfStock ? (
+            <button className="wa-order-btn disabled">
+              Out of Stock
             </button>
           ) : (
             <button className="wa-order-btn" style={{ background: 'var(--saffron)', color: 'var(--white)' }} onClick={() => addToCart(product)}>
@@ -144,18 +54,20 @@ const ProductCard = ({ product, i, sectionType }) => {
 
 export default function ProductsPage() {
   const [activeFilter, setActiveFilter] = useState('All');
+  const { products } = useProducts();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  const activeProducts = products.filter((product) => product.isActive);
   const filteredRaw = activeFilter === 'All'
-    ? rawProducts
-    : rawProducts.filter(p => p.category === activeFilter);
+    ? activeProducts.filter((product) => product.section === 'raw')
+    : activeProducts.filter((product) => product.section === 'raw' && product.category === activeFilter);
 
   const filteredPrepared = activeFilter === 'All'
-    ? preparedProducts
-    : preparedProducts.filter(p => p.category === activeFilter);
+    ? activeProducts.filter((product) => product.section === 'prepared')
+    : activeProducts.filter((product) => product.section === 'prepared' && product.category === activeFilter);
 
   return (
     <div className="products-page">
