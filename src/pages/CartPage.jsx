@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useProducts } from '../context/ProductContext';
 import { formatPrice } from '../data/products';
 import './CartPage.css';
 
 export default function CartPage() {
     const { cartItems, removeFromCart, updateQuantity, getCartTotal } = useCart();
+    const { getImageSrc } = useProducts();
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
@@ -90,7 +92,7 @@ export default function CartPage() {
                             return (
                                 <div className="cart-item" key={item.id || i}>
                                     <div className="cart-item-product">
-                                        <img src={item.img} alt={item.name} />
+                                        <img src={getImageSrc(item.img)} alt={item.name} />
                                         <div className="cart-item-info">
                                             <h3>{item.name}</h3>
                                             <p>{formatPrice(item.price)} per {item.variantLabel}</p>

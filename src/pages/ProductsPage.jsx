@@ -6,7 +6,7 @@ import { categories, formatPrice, getDefaultVariant, getTotalStock, getVariantBy
 import './ProductsPage.css';
 import '../components/ProductShowcase.css';
 
-const ProductCard = ({ product, i, sectionType }) => {
+const ProductCard = ({ product, i, sectionType, imageSrc }) => {
   const { addToCart, cartItems } = useCart();
   const navigate = useNavigate();
   const defaultVariant = useMemo(() => getDefaultVariant(product), [product]);
@@ -24,7 +24,7 @@ const ProductCard = ({ product, i, sectionType }) => {
   return (
     <div className="product-card" key={product.name} id={`product-${sectionType}-${i}`}>
       <div className="product-card-img">
-        <img src={product.img} alt={product.name} />
+        <img src={imageSrc} alt={product.name} />
         <div className="product-badge">{product.badge}</div>
         <div className="veg-badge"></div>
         {isOutOfStock && <div className="product-stock-pill">Out of Stock</div>}
@@ -80,7 +80,7 @@ const ProductCard = ({ product, i, sectionType }) => {
 
 export default function ProductsPage() {
   const [activeFilter, setActiveFilter] = useState('All');
-  const { products } = useProducts();
+  const { products, getImageSrc } = useProducts();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -187,7 +187,7 @@ export default function ProductsPage() {
             </h2>
             <div className="products-page-grid">
               {filteredRaw.map((product, i) => (
-                <ProductCard key={product.name} product={product} i={i} sectionType="raw" />
+                <ProductCard key={product.name} product={product} i={i} sectionType="raw" imageSrc={getImageSrc(product.img)} />
               ))}
             </div>
           </div>
@@ -200,7 +200,7 @@ export default function ProductsPage() {
             </h2>
             <div className="products-page-grid">
               {filteredPrepared.map((product, i) => (
-                <ProductCard key={product.name} product={product} i={i} sectionType="prepared" />
+                <ProductCard key={product.name} product={product} i={i} sectionType="prepared" imageSrc={getImageSrc(product.img)} />
               ))}
             </div>
           </div>

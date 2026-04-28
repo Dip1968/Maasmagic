@@ -10,6 +10,7 @@ import {
   getTotalStock,
   getVariantById,
 } from '../data/products';
+import { createImageKey, saveImageFile } from '../utils/imageStorage';
 import './AdminPage.css';
 
 const productSections = [
@@ -37,16 +38,34 @@ const toSlug = (value) =>
 
 export default function AdminPage() {
   const { isAuthenticated, login, logout } = useAdminAuth();
-  const { products, addProduct, updateProduct, deleteProduct, resetProducts } = useProducts();
+  const { products, addProduct, updateProduct, deleteProduct, resetProducts, getImageSrc } = useProducts();
   const [formState, setFormState] = useState(createInitialFormState);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [authError, setAuthError] = useState('');
+  const [uploadingFormImage, setUploadingFormImage] = useState(false);
+  const [uploadingProductId, setUploadingProductId] = useState('');
+  const [pendingFormImageFile, setPendingFormImageFile] = useState(null);
+  const [pendingFormImagePreview, setPendingFormImagePreview] = useState('');
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  useEffect(() => {
+    if (!pendingFormImageFile) {
+      setPendingFormImagePreview('');
+      return undefined;
+    }
+
+    const objectUrl = URL.createObjectURL(pendingFormImageFile);
+    setPendingFormImagePreview(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [pendingFormImageFile]);
 
   const visibleProducts = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
@@ -85,37 +104,61 @@ export default function AdminPage() {
     }));
   };
 
-  const handleAddProduct = (event) => {
+  const handleFormImageUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setPendingFormImageFile(file);
+    setStatusMessage(`Selected "${file.name}" for the new product.`);
+    event.target.value = '';
+  };
+
+  const handleAddProduct = async (event) => {
     event.preventDefault();
 
     const trimmedName = formState.name.trim();
-    if (!trimmedName || !formState.img.trim()) {
+    if (!trimmedName || (!formState.img.trim() && !pendingFormImageFile)) {
       setStatusMessage('Please add at least a product name and image path.');
       return;
     }
 
-    addProduct({
-      ...formState,
-      id: toSlug(trimmedName),
-      name: trimmedName,
-      desc: formState.desc.trim(),
-      img: formState.img.trim(),
-      badge: formState.badge.trim(),
-      category: formState.category.trim(),
-      variants: formState.variants.map((variant) => ({
-        ...variant,
-        price: Number(variant.price),
-        stock: Number(variant.stock),
-      })),
-      tags: formState.tags
-        .toString()
-        .split(',')
-        .map((tag) => tag.trim())
-        .filter(Boolean),
-    });
+    const productId = toSlug(trimmedName);
 
-    setFormState(createInitialFormState());
-    setStatusMessage(`Added "${trimmedName}" to the catalog.`);
+    try {
+      setUploadingFormImage(Boolean(pendingFormImageFile));
+
+      const uploadedImageRef = pendingFormImageFile
+        ? await saveImageFile(pendingFormImageFile, createImageKey(productId, pendingFormImageFile.name))
+        : '';
+
+      addProduct({
+        ...formState,
+        id: productId,
+        name: trimmedName,
+        desc: formState.desc.trim(),
+        img: uploadedImageRef || formState.img.trim(),
+        badge: formState.badge.trim(),
+        category: formState.category.trim(),
+        variants: formState.variants.map((variant) => ({
+          ...variant,
+          price: Number(variant.price),
+          stock: Number(variant.stock),
+        })),
+        tags: formState.tags
+          .toString()
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+      });
+
+      setFormState(createInitialFormState());
+      setPendingFormImageFile(null);
+      setStatusMessage(`Added "${trimmedName}" to the catalog.`);
+    } catch (error) {
+      setStatusMessage(error.message || 'Unable to save the uploaded image.');
+    } finally {
+      setUploadingFormImage(false);
+    }
   };
 
   const handleInlineChange = (productId, field, value) => {
@@ -133,6 +176,23 @@ export default function AdminPage() {
     );
 
     updateProduct(productId, { variants });
+  };
+
+  const handleProductImageUpload = async (productId, event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingProductId(productId);
+      const uploadedImageRef = await saveImageFile(file, createImageKey(productId, file.name));
+      updateProduct(productId, { img: uploadedImageRef });
+      setStatusMessage(`Updated product image with "${file.name}".`);
+    } catch (error) {
+      setStatusMessage(error.message || 'Unable to save the uploaded image.');
+    } finally {
+      setUploadingProductId('');
+      event.target.value = '';
+    }
   };
 
   const handleCredentialChange = (event) => {
@@ -246,7 +306,7 @@ export default function AdminPage() {
             <div className="admin-panel-head">
               <div>
                 <h2>Add new product</h2>
-                <p>Create a new item with price, quantity, tags, image path, and store section.</p>
+                <p>Create a new item with price, quantity, tags, an uploaded image or path, and store section.</p>
               </div>
             </div>
 
@@ -268,6 +328,21 @@ export default function AdminPage() {
                   Image path
                   <input name="img" value={formState.img} onChange={handleFormChange} placeholder="/images/example.png" />
                 </label>
+                <div className="admin-form-full admin-image-upload-block">
+                  <label>
+                    Upload image
+                    <input type="file" accept="image/*" onChange={handleFormImageUpload} />
+                  </label>
+                  <p className="admin-input-hint">
+                    Choose an image from your computer, or keep using a path like `/images/example.png`.
+                  </p>
+                  {uploadingFormImage && <p className="admin-input-hint">Uploading image...</p>}
+                  {(pendingFormImagePreview || formState.img) && (
+                    <div className="admin-image-preview">
+                      <img src={pendingFormImagePreview || getImageSrc(formState.img)} alt="New product preview" />
+                    </div>
+                  )}
+                </div>
                 <label>
                   Category
                   <input name="category" list="product-categories" value={formState.category} onChange={handleFormChange} />
@@ -326,7 +401,14 @@ export default function AdminPage() {
 
               <div className="admin-form-actions">
                 <button type="submit" className="admin-primary-btn">Add product</button>
-                <button type="button" className="admin-secondary-btn" onClick={() => setFormState(createInitialFormState())}>
+                <button
+                  type="button"
+                  className="admin-secondary-btn"
+                  onClick={() => {
+                    setFormState(createInitialFormState());
+                    setPendingFormImageFile(null);
+                  }}
+                >
                   Clear form
                 </button>
               </div>
@@ -339,7 +421,7 @@ export default function AdminPage() {
             <div className="admin-panel-head admin-panel-head-split">
               <div>
                 <h2>Manage existing products</h2>
-                <p>Update any field inline. Changes are saved immediately in local storage.</p>
+                <p>Update any field inline. Product details save in browser storage, and uploaded images are kept separately for better reliability.</p>
               </div>
               <button type="button" className="admin-secondary-btn" onClick={resetProducts}>
                 Reset defaults
@@ -367,7 +449,7 @@ export default function AdminPage() {
                     return (
                       <>
                   <div className="admin-product-summary">
-                    <img src={product.img} alt={product.name} />
+                    <img src={getImageSrc(product.img)} alt={product.name} />
                     <div>
                       <h3>{product.name}</h3>
                       <p>
@@ -417,6 +499,21 @@ export default function AdminPage() {
                       Image path
                       <input value={product.img} onChange={(event) => handleInlineChange(product.id, 'img', event.target.value)} />
                     </label>
+                    <div className="admin-product-full admin-image-upload-block">
+                      <label>
+                        Upload new image
+                        <input type="file" accept="image/*" onChange={(event) => handleProductImageUpload(product.id, event)} />
+                      </label>
+                      <p className="admin-input-hint">
+                        This can replace the current path with an uploaded image from your computer.
+                      </p>
+                      {uploadingProductId === product.id && <p className="admin-input-hint">Uploading image...</p>}
+                      {product.img && (
+                        <div className="admin-image-preview">
+                          <img src={getImageSrc(product.img)} alt={`${product.name} preview`} />
+                        </div>
+                      )}
+                    </div>
                     <label className="admin-product-full">
                       Tags
                       <input

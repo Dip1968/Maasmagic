@@ -327,6 +327,34 @@
   color: var(--forest-green);
 }
 
+.admin-input-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.admin-image-upload-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-image-preview {
+  width: min(100%, 220px);
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #ede5d7;
+  background: var(--cream-light);
+}
+
+.admin-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .admin-variant-editor {
   display: flex;
   flex-direction: column;
